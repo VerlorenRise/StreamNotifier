@@ -1,0 +1,19 @@
+name: StreamNotifier
+version: '${project.version}'
+main: ru.streamnotifier.StreamNotifierPlugin
+api-version: '1.20'
+description: Lightweight Twitch stream notifier integrated with DiscordSRV
+author: StreamNotifier
+depend:
+  - DiscordSRV
+
+commands:
+  streamnotifier:
+    description: StreamNotifier plugin administration
+    permission: streamnotifier.admin
+    usage: /<command> [reload | test <twitch_login>]
+
+permissions:
+  streamnotifier.admin:
+    description: Allows reloading and testing StreamNotifier notifications
+    default: op
