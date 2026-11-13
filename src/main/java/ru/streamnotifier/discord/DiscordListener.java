@@ -33,8 +33,13 @@ public class DiscordListener extends ListenerAdapter {
     );
 
     private static final Pattern STREAM_TITLE_PATTERN = Pattern.compile(
-            "(?im)(?:название\\s+стрима|stream\\s*title|тема\\s*стрима)\\s*[:\\*\\s]*([^\r\n]+)",
+            "(?im)(?:название\\s+стрима|stream\\s*title|тема\\s*стрима)[\\t :*]*+([^\r\n]*)",
             Pattern.UNICODE_CASE
+    );
+
+    private static final Pattern STREAM_TITLE_END_PATTERN = Pattern.compile(
+            "[\\t ]*(?:\\*{0,2}(?:ссылка\\s+на\\s+стрим|stream\\s*url|twitch\\s*url)[\\t *]*:|[⸺─━—]{3,})",
+            Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
     );
 
     private final Plugin plugin;
@@ -216,6 +221,11 @@ public class DiscordListener extends ListenerAdapter {
         Matcher matcher = STREAM_TITLE_PATTERN.matcher(combinedText);
         if (matcher.find()) {
             String raw = matcher.group(1).trim();
+            // Webhooks can place all labels and decorative separators on a single line.
+            Matcher end = STREAM_TITLE_END_PATTERN.matcher(raw);
+            if (end.find()) {
+                raw = raw.substring(0, end.start());
+            }
             // Clean markdown characters from both ends: *, `, _, >, ~
             String cleaned = raw.replaceAll("^[\\*`_>~\\s]+|[\\*`_>~\\s]+$", "").trim();
             if (!cleaned.isEmpty()) {
